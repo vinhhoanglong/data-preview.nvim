@@ -4,6 +4,7 @@ local M = {}
 
 local ui = require("data-preview.ui")
 local providers = require("data-preview.providers")
+local formatter = require("data-preview.formatter")
 
 function M.preview()
 	local filepath = vim.fn.expand("%:p")
@@ -47,14 +48,11 @@ function M.preview()
 		on_exit = function(_, code)
 			vim.schedule(function()
 				if code == 0 then
-					if #output_lines == 0 then
-						ui.open_float({ "[Command ran successfully, but produced no output]" }, nil)
-					else
-						ui.open_float(output_lines, "table")
-					end
+					local formatted_lines, filetype = formatter.format(output_lines, "table")
+					ui.open_float(formatted_lines, filetype, "Data Preview: " .. vim.fn.fnamemodify(filepath, ":t"))
 				else
 					table.insert(stderr_lines, 1, "ERROR: Command failed (code " .. code .. "):")
-					ui.open_float(stderr_lines, nil)
+					ui.open_float(stderr_lines, "text", "Error")
 				end
 			end)
 		end,
@@ -99,14 +97,11 @@ function M.preview_stats()
 		on_exit = function(_, code)
 			vim.schedule(function()
 				if code == 0 then
-					if #output_lines == 0 then
-						ui.open_float({ "[Command ran successfully, but produced no output]" }, nil)
-					else
-						ui.open_float(output_lines, nil)
-					end
+					local formatted_lines, filetype = formatter.format(output_lines, "stats")
+					ui.open_float(formatted_lines, filetype, "Stats: " .. vim.fn.fnamemodify(filepath, ":t"))
 				else
 					table.insert(stderr_lines, 1, "ERROR: Command failed (code " .. code .. "):")
-					ui.open_float(stderr_lines, nil)
+					ui.open_float(stderr_lines, "text", "Error")
 				end
 			end)
 		end,
