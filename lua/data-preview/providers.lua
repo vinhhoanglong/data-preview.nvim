@@ -1,6 +1,6 @@
 -- TODO: simple backend to handle data preview
 -- implement head() file logic and get_metadata() logic of a parquet file
-
+-- get the inspect command 'parquet-tools inspect filepath' result, extract the information from that result then display with my own ui
 local M = {}
 
 local data_command_providers = {
